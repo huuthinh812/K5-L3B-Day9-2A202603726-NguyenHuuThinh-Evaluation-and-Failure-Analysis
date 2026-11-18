@@ -1,5 +1,9 @@
 # K5 · Day 9 · Lab — Evaluation & Failure Analysis (LogiX-VN)
 
+Tác giả bài nộp: **Nguyễn Hữu Thịnh**. Trạng thái kiểm thử và phần đã hoàn thiện xem [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md).
+
+Chạy toàn bộ kiểm tra công khai từ `src/`: `python -m lab9.verify`. Lệnh kiểm tra cả exit code dự kiến (helpful judge và seeded regression phải bị từ chối), ghi kết quả vào `src/reports/validation_m6_m7.txt`.
+
 > Nối tiếp Lab 8. Lab 8 trả lời "agent có chạy không"; Lab 9 trả lời **"làm sao biết bản mới tốt hơn — và chặn được bản tệ trước khi merge"**.
 > Không cần API key: MockLLM + judge replay. **Không Langfuse / OTel** (observability học ở Day 14).
 

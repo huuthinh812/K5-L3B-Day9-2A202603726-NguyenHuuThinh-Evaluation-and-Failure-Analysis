@@ -1,4 +1,6 @@
 __pycache__/
+.verification/
+.pytest_cache/
 *.pyc
 src/reports/*
 !src/reports/baseline_v1.json

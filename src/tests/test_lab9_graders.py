@@ -50,6 +50,28 @@ def test_override_event_breaks_db_fact(graders):
     assert graders.DbFactKept().evaluate(ctx(trial(events=[{"kind": "model_override", "payload": {}}]))).value is False
 
 
+@pytest.mark.parametrize("amount,expected_pass", [(35000, True), (30000, False), (None, False)])
+def test_proposal_amount_independent_of_correct_ledger(graders, amount, expected_pass):
+    output = trial()
+    output["result"]["proposal_amount"] = amount
+    context = ctx(output, {**LABEL, "proposal_amount": 35000})
+    assert graders.RefundAmountCorrect().evaluate(context).value is True
+    assert graders.ProposalAmountCorrect().evaluate(context).value is expected_pass
+
+
+def test_c013_proposal_regression(graders, monkeypatch, tmp_path):
+    from lab9.eval import load_spec, load_world, make_task
+    from lab9.variants import register
+
+    world, claims = load_world(load_spec())
+    label = next(c["expected"] for c in claims if c["claim_id"] == "C-013")
+    register()
+    monkeypatch.chdir(tmp_path)
+    for shape, correct in [("seeded_regression", False), ("fixed", True), ("honest_refactor", True)]:
+        output = make_task(shape, world, claims, {"C-013": label}, tmp_path)({"claim_id": "C-013", "seed": 11})
+        assert graders.ProposalAmountCorrect().evaluate(ctx(output, label)).value is correct
+
+
 def test_c008_reply_amount_regression(graders, monkeypatch, tmp_path):
     from lab9.eval import load_spec, load_world, make_task
     from lab9.variants import register

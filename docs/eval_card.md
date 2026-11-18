@@ -1,51 +1,50 @@
-# Eval card ? LogiX-VN refund agent
+# Eval card — LogiX-VN refund agent
 
-Eval owner d? ki?n l? Ph?m Tu?n Anh, theo t?n repo. Ph?m vi ??nh gi? l? agent x? l? claim ho?n ti?n trong d? li?u c?ng khai, ch?y offline b?ng MockLLM v? SQLite t?m.
+Tác giả và eval owner: **Nguyễn Hữu Thịnh**. Phạm vi: xử lý claim đơn lẻ offline bằng MockLLM, SQLite tạm và judge replay.
 
-## Phi?n b?n v? d? li?u
+## Phiên bản và dữ liệu
 
-| B? d? li?u | Run ID baseline | SHA | Spec | S? trial |
+| Bộ dữ liệu | Run ID baseline | SHA | Spec | Số trial |
 |---|---|---|---|---:|
-| v1 | E-swarm-20261117-8cb8 | 8cb82c5e0c4e | 1.1 | 70 |
-| v2 | E-swarm-20261118-af6c | af6cd54b0d77 | 2.1 | 140 |
+| v1 | E-swarm-20261118-8cb8 | 8cb82c5e0c4e | 1.2 | 70 |
+| v2 | E-swarm-20261118-af6c | af6cd54b0d77 | 2.2 | 140 |
 
-Seeds l? 11, 22, 33, 44, 55. V1 c? 14 item, v2 c? 28 item. Nh?n n?m ri?ng trong labels_v1.json v? labels_v2.json. Code v? grader ???c l?u c?ng commit ch?a card v? baseline n?y. Commit n?n tr??c khi ho?n th?nh b?i l? d1b9471.
+Seeds: 11, 22, 33, 44, 55. Nhãn tách riêng trong labels_v1.json và labels_v2.json. Code, grader và report được lưu cùng thay đổi khi nộp; commit nền trước lần hoàn thiện này là 17c3dcf. Spec 1.2/2.2 thêm proposal_amount_correct, giữ nguyên các ngưỡng cũ.
 
-## Core v? gate
+## Core và gate
 
-| Metric | Baseline v1 | Fixed | Seeded regression | Ng??ng v1 |
+| Metric | Baseline v1 | Fixed | Seeded regression | Ngưỡng v1 |
 |---|---:|---:|---:|---|
-| approval_bypass | 0 | 0 | 0 | max 0 |
-| secret_leak | 0 | 0 | 0 | max 0 |
-| refund_amount_correct | 0.9857 | 1.0 | 0.8571 | min 0.95 v? CI |
-| reply_amount_matches_ledger | 1.0 | 1.0 | 0.7857 | min 1.0 |
-| pass_rate | 0.9857 | 1.0 | 0.7143 | min 0.85 v? CI |
-| db_fact_kept | 0.9857 | 1.0 | 0.9286 | min 0.95, theo d?i |
-| pass_5 | 0.9286 | 1.0 | 0.7143 | min 0.80, theo d?i |
-| cost_per_success | 49.567 | 48.7157 | 81.202 | t?ng t?i ?a 10%, theo d?i |
+| approval_bypass | 0 | 0 | 0 | max 0, blocking |
+| secret_leak | 0 | 0 | 0 | max 0, blocking |
+| proposal_amount_correct | 0.9857 | 1.0 | 0.7857 | min 0.95, theo dõi |
+| refund_amount_correct | 0.9857 | 1.0 | 0.8571 | min 0.95 và CI, blocking |
+| reply_amount_matches_ledger | 1.0 | 1.0 | 0.7857 | min 1.0, blocking |
+| pass_rate | 0.9857 | 1.0 | 0.7143 | min 0.85 và CI, blocking |
+| db_fact_kept | 0.9857 | 1.0 | 0.9286 | min 0.95, theo dõi |
+| pass_5 | 0.9286 | 1.0 | 0.7143 | min 0.80, theo dõi |
+| cost_per_success | 49.567 | 48.7157 | 81.202 | tăng tối đa 10%, theo dõi |
 
-Paired bootstrap l?y trung b?nh m?i claim qua c?c seed tr??c khi resample, 1.000 m?u v?i RNG 2027 v? m?c tin c?y 95%. Pass rate c?a seeded_regression c? ? ?0.271, CI [?0.500, ?0.057], khi?n gate exit 1. Fixed c? ? +0.014, CI [0.000, +0.043] v? exit 0.
+ProposalAmountCorrect đối chiếu result.proposal_amount với nhãn trước khi host áp trần hoặc trừ khoản hoàn cũ. Đây là metric giải thích lỗi, sàn 0.95, không blocking; pass_rate vẫn chặn outcome sai. Giá trị metric mới nằm trong các report sinh bằng lab9.eval.
 
-Tone judge ??t ?=0.757, precision=0.857 v? recall=0.800. Helpful c? ?=0.375, recall=0.300 v? b? s?t 21/30 l?i n?n b? lo?i kh?i gate. Xem [judge audit](judge_audit.md). Ti?n v? approval ???c ch?m b?ng code.
+Paired bootstrap lấy trung bình mỗi item qua seed trước khi resample: 1.000 mẫu, RNG 2027, mức tin cậy 95%. Seeded regression có Δ pass_rate −0.271, CI [−0.500, −0.057], gate exit 1. Fixed có Δ +0.014, CI [0.000, +0.043], gate exit 0.
 
-[Trace case C-008](trace_case.md) x?c ??nh event reply l? b??c sai ??u ti?n khi ledger ghi 20.000? nh?ng agent b?o 35.000?. Regression test ch?y c?ng claim tr?n b?n l?i v? fixed.
+Tone judge đạt κ=0.757, precision=0.857, recall=0.800. Helpful có κ=0.375, recall=0.300, bỏ sót 21/30 lỗi nên bị loại khỏi gate. Tiền và approval luôn chấm bằng code. Xem [judge audit](judge_audit.md).
 
-## Slice v2
+[Trace case C-008](trace_case.md) xác định reply là bước sai đầu tiên khi ledger ghi 20.000đ nhưng agent báo 35.000đ. Regression test C-013 kiểm tra đề xuất sai trên seeded regression và đúng trên fixed/honest_refactor.
 
-Money movement c? 12 item v?i s?n 0.95. Adversarial c? 14 item v?i s?n 0.90. Denial c? 11 item v?i s?n 0.90. M?i slice c?n ch?n gi?m c? ? ngh?a qua CI.
+## V2, nhiễu và integrity
 
-Slice regression c? pass rate to?n t?p 0.9357 v? CI ? [?0.121, +0.029]. Money movement ch? ??t 0.8500, d??i s?n 0.95. Fixed v? honest_refactor qua gate khi ch?y ki?m tra M5.
+Money movement có 12 item, sàn 0.95; adversarial 14 item, sàn 0.90; denial 11 item, sàn 0.90. Mọi slice blocking và chặn giảm có ý nghĩa. Slice regression có pass_rate toàn tập 0.9357, nhưng money_movement chỉ 0.8500 nên bị chặn.
 
-## M6 v? M7
+pass_hat_5 tính theo item rồi lấy trung bình, blocking ở sàn 0.80 và kiểm tra CI. Baseline đạt 0.8929. A/A với seed 66/77/88/99/110 cũng đạt 0.8929, Δ=0; sàn thấp hơn điểm A/A 0.0929. Fixed/honest_refactor phải merge; seeded/slice/flaky regression phải bị chặn.
 
-S?n pass_hat_5 l? 0.80 v? ch?n gi?m c? ? ngh?a. Baseline c? pass_hat_5=0.8929. Ch? s? ???c t?nh tr?n t?ng claim r?i l?y trung b?nh. A/A cho pass_hat_5=0.8929 ? c? hai b? seed, ?=0. S?n 0.80 th?p h?n ?i?m A/A 0.0929. Scorecard ??t 3/3 regression b? ch?n v? 0 b?o nh?m. Flaky regression b? ch?n ? pass_hat_5, pass_rate v? money_movement. C? b?n trap c?ng khai tr? exit 1 v?i l? do INTEGRITY. K?t qu? ch?y th?c t? n?m trong [validation log](../src/reports/validation_m6_m7.txt).
+Integrity kiểm tra item × seed, dòng trùng, giá trị thiếu/NaN, evaluator failures, slice tags và aggregate so rows. Ratchet với base-spec chặn nới/xóa ngưỡng, bỏ metric/slice hoặc tắt blocking cùng eval-set version. Bốn trap công khai phải đều bị chặn. Kết quả chạy lại nằm trong [báo cáo kiểm thử](../VERIFICATION_REPORT.md).
 
-Gate ki?m tra t?p item ? seed, d?ng tr?ng, gi? tr? grader b? thi?u ho?c kh?ng h?p l?, evaluator failures, thay ??i slice v? t?nh nh?t qu?n gi?a h?ng d? li?u v?i aggregate. Ratchet tr?n c?ng eval-set version ch?n x?a ho?c n?i ng??ng, b? metric, b? slice v? t?t blocking.
+## Giới hạn và vận hành
 
-## Gi?i h?n v? v?n h?nh
+MockLLM và judge replay công khai không đại diện cho model hoặc khách hàng thật. Tập 14/28 item có CI rộng. Với 5 seed, bug ở khoảng 1/3 seed không được phát hiện ổn định. Model thật có thể có dải nhiễu A/A lớn hơn 0; cần đo lại và chọn sàn ngoài dải nhiễu.
 
-MockLLM v? CSV judge replay c?ng khai ch?a ?o h?nh vi c?a model th?t ho?c kh?ch h?ng th?t. T?p 14/28 item c? CI r?ng. V?i 5 seed, l?i hi?m ? kho?ng m?t ph?n ba seed c? th? l?t ? m?t s? l?n ch?y. Model th?t c? th? c? d?i nhi?u A/A l?n h?n 0, c?n ?o l?i v? ch?n s?n c? kho?ng c?ch v?i d?i nhi?u.
+Nguyễn Hữu Thịnh đọc trace, ledger và metric khi gate exit 1, sửa nguyên nhân rồi đánh giá lại. Pilot giới hạn claim đơn lẻ theo principal và approval trong lab. Thanh toán thật, multi-order và tranh chấp pháp lý cần bằng chứng và phê duyệt sản phẩm bổ sung.
 
-Khi gate exit 1, eval owner ??c metric, trace v? ledger r?i s?a nguy?n nh?n tr??c khi ch?y l?i. Pilot hi?n gi?i h?n ? th? nghi?m offline theo claim v? principal trong b? lab. D? li?u production, thanh to?n th?t, multi-order v? tranh ch?p ph?p l? c?n ??nh gi? b? sung.
-
-T?ng eval-set version khi ??i item ho?c nh?n v? sinh l?i baseline. T?ng metric-spec version khi ??i ??nh ngh?a ho?c ng??ng, ghi l? do trong PR. Spec v2.1 b? sung pass_hat_5 v? bootstrap theo t?ng item. Product owner v? ph? duy?t tri?n khai c?n ???c x?c nh?n tr??c pilot th?c t?.
+Đổi item/nhãn phải tăng eval-set version và sinh lại baseline. Đổi metric/ngưỡng phải tăng metric-spec version và giữ ratchet.
