@@ -27,6 +27,8 @@ Nhánh kiểm thử: `starter/d09` (working tree dựa trên commit `17c3dcf`). 
 
 Ghi nhận môi trường: một lần A/A có pass_rate Δ=0.0072, pass_hat_5 Δ=0.0358; chẩn đoán lại hai bộ seed đạt cùng pass_rate=0.9786, pass_hat_5=0.8929. Verifier đã bổ sung điều kiện mọi delta A/A phải bằng 0 để không chỉ dựa vào exit code. Chưa xác định nguyên nhân dao động đơn lẻ này.
 
-1. Commit và push toàn bộ thay đổi hiện tại trên `starter/d09` lên remote (đặc biệt các file vừa cập nhật ở working tree và `VERIFICATION_REPORT.md` nếu muốn giữ liên kết từ `docs/eval_card.md`).
-2. Kiểm tra lại `git remote -v` và git author nếu cần đồng bộ tài khoản GitHub của Nguyễn Hữu Thịnh.
-3. Mở PR từ `starter/d09` → `main`, điền checklist `SUBMISSION.md`, dán output `seeded_regression`, `lab9.mutation` (scorecard + `--aa`) và 4 dòng trap vào mô tả PR, rồi kiểm tra job GitHub Actions (`eval-gate` và `eval-gate-v2`) chạy xanh.
+Đã push nhánh starter/d09 lên repo của Nguyễn Hữu Thịnh và mở [PR #1](https://github.com/huuthinh812/K5-L3B-Day9-2A202603726-NguyenHuuThinh-Evaluation-and-Failure-Analysis/pull/1), kèm output gate, scorecard, A/A và bốn trap exit 1.
+
+[GitHub Actions](https://github.com/huuthinh812/K5-L3B-Day9-2A202603726-NguyenHuuThinh-Evaluation-and-Failure-Analysis/actions/runs/44237958844) trên commit 3742686 xác nhận detect, eval-gate và eval-gate-v2 đều success. Commit cập nhật checklist sau đó chỉ đổi tài liệu và cần CI xanh trước khi merge.
+
+Theo hướng dẫn mới nhất, giảng viên chấm main của fork sau khi merge PR. Bước ngoài GitHub còn lại: dán link repo fork vào LMS đúng ca và hạn nộp.
