@@ -6,14 +6,18 @@
 # Python / OS (the PowerShell setup creates src/.venv inside the repo)
 .venv/
 __pycache__/
-*.py[cod]
+.verification/
 .pytest_cache/
+*.py[cod]
 .DS_Store
-
-# Runtime output. Reports for grading (baseline_v1/v2, eval_fixed, eval_seeded_regression)
-# are committed with: git add -f reports/*.json
-src/reports/
-traces/
+src/reports/*
+!src/reports/baseline_v1.json
+!src/reports/baseline_v2.json
+!src/reports/eval_fixed.json
+!src/reports/eval_seeded_regression.json
+!src/reports/validation_m6_m7.txt
+!src/reports/eval_slice_regression.json
+src/traces/
 *.sqlite
 *.sqlite-*
 student_drop/
